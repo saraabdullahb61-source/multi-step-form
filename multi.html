@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Step Registration Form</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f8f8f8;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+    }
+    .form-container {
+        background: white;
+        width: 500px;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    }
+    .step-header {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    .step {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        font-weight: bold;
+        border: 1px solid #ccc;
+    }
+    .active-step {
+        background: #4a90e2;
+        color: white;
+    }
+    .form-step {
+        display: none;
+    }
+    .form-step.active {
+        display: block;
+    }
+    fieldset {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    legend {
+        font-weight: bold;
+    }
+    label {
+        display: block;
+        margin: 10px 0 5px;
+    }
+    input {
+        width: 95%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+    .buttons {
+        display: flex;
+        justify-content: space-between;
+    }
+    button {
+        background: #003366;
+        color: white;
+        padding: 8px 20px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+    button:hover {
+        background: #0055aa;
+    }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="step-header">
+        <div class="step active-step">Step 1: Account</div>
+        <div class="step">Step 2: Personal Details</div>
+        <div class="step">Step 3: Your Review</div>
+    </div>
+
+    <form id="multiForm">
+         
+        <div class="form-step active">
+            <fieldset>
+                <legend>Account</legend>
+                <label>Email Address:</label>
+                <input type="email" placeholder="Enter Email" required>
+                <label>Password:</label>
+                <input type="password" placeholder="Enter Password" required>
+                <label>Confirm Password:</label>
+                <input type="password" placeholder="Confirm Password" required>
+            </fieldset>
+            <div class="buttons">
+                <button type="button" disabled>Back</button>
+                <button type="button" onclick="nextStep()">Next ➡</button>
+            </div>
+        </div>
+
+         
+        <div class="form-step">
+            <fieldset>
+                <legend>Personal Details</legend>
+                <label>Full Name:</label>
+                <input type="text" placeholder="Enter Name" required>
+                <label>Phone Number:</label>
+                <input type="tel" placeholder="Enter Phone" required>
+                <label>Date of Birth:</label>
+                <input type="date" required>
+            </fieldset>
+            <div class="buttons">
+                <button type="button" onclick="prevStep()">⬅ Back</button>
+                <button type="button" onclick="nextStep()">Next ➡</button>
+            </div>
+        </div>
+
+       
+        <div class="form-step">
+            <fieldset>
+                <legend>Review</legend>
+                <p>Check all your details before submitting.</p>
+            </fieldset>
+            <div class="buttons">
+                <button type="button" onclick="prevStep()">⬅ Back</button>
+                <button type="submit">Submit ✔</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+let currentStep = 0;
+const steps = document.querySelectorAll(".form-step");
+const stepIndicators = document.querySelectorAll(".step");
+
+function showStep(step) {
+    steps.forEach((s, i) => s.classList.toggle("active", i === step));
+    stepIndicators.forEach((s, i) => s.classList.toggle("active-step", i === step));
+}
+
+function nextStep() {
+    if (currentStep < steps.length - 1) {
+        currentStep++;
+        showStep(currentStep);
+    }
+}
+
+function prevStep() {
+    if (currentStep > 0) {
+        currentStep--;
+        showStep(currentStep);
+    }
+}
+</script>

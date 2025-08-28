@@ -1,0 +1,391 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Saylani Registration Form — Sample</title>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --accent:#0b79d0;
+    --accent-2:#0a5f9a;
+    --muted:#6b7885;
+    --danger:#d9534f;
+    --success:#28a745;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    background:linear-gradient(180deg,#e9f2fb 0%, #f4f7fb 100%);
+    padding:28px;
+    color:#123;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+  }
+
+  .container{
+    width:100%;
+    max-width:920px;
+    background:var(--card);
+    border-radius:12px;
+    box-shadow:0 8px 30px rgba(10,25,40,0.08);
+    padding:22px;
+    overflow:hidden;
+  }
+  h1{ margin:0 0 6px 0; font-size:20px; color:var(--accent-2) }
+  p.lead{ margin:0 0 18px 0; color:var(--muted); font-size:14px }
+
+  form{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; align-items:start; }
+  .full{ grid-column: 1 / -1; }
+  label{ display:block; font-size:13px; margin-bottom:6px; color:#0d2b40; }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea {
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #d7e3ef;
+    background:#fbfdff;
+    border-radius:8px;
+    font-size:14px;
+    outline:none;
+    transition:box-shadow .12s, border-color .12s;
+  }
+  input:focus, select:focus, textarea:focus{ box-shadow:0 6px 18px rgba(11,121,208,0.12); border-color:var(--accent); }
+  textarea{ min-height:90px; resize:vertical; }
+
+  .hint{ font-size:12px; color:var(--muted); margin-top:6px; }
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .actions{ display:flex; gap:10px; align-items:center; margin-top:8px; }
+  button.primary{
+    background:linear-gradient(180deg,var(--accent),var(--accent-2));
+    color:white; border:none; padding:10px 14px; border-radius:9px; cursor:pointer; font-weight:700;
+  }
+  button.ghost{ background:transparent; border:1px solid #d7e3ef; padding:10px 12px; border-radius:9px; cursor:pointer; }
+
+  .small{ font-size:13px; color:var(--muted); }
+
+  .row{ display:flex; gap:10px; align-items:center; }
+
+  /* validation */
+  .error{ border-color:var(--danger) !important; box-shadow:0 6px 18px rgba(217,83,79,0.08); }
+  .errorMsg{ color:var(--danger); font-size:13px; margin-top:6px; display:none; }
+  .errorMsg.show{ display:block; }
+
+  /* file preview */
+  .preview{
+    display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap;
+  }
+  .preview img{ width:84px; height:84px; object-fit:cover; border-radius:6px; border:1px solid #e6eef8; }
+
+  /* success modal */
+  .modal{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+    background: rgba(6,10,20,0.45); z-index:1200;
+  }
+  .modalCard{
+    background:white; padding:18px; border-radius:10px; width:min(520px,94vw);
+    box-shadow:0 10px 40px rgba(2,10,30,0.4); text-align:center;
+  }
+  .ok{ background:var(--success); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; margin-top:12px; }
+
+  @media (max-width:800px){
+    form{ grid-template-columns: 1fr; }
+    .full{ grid-column:auto; }
+  }
+
+</style>
+</head>
+<body>
+  <div class="container" role="main" aria-labelledby="formTitle">
+    <h1 id="formTitle">Saylani Registration Form</h1>
+    <p class="lead">Fill in your details below. This is a front-end sample — to actually register people you need a server endpoint to receive and store submitted data.</p>
+
+    <form id="regForm" novalidate>
+       
+      <div>
+        <label for="fullName">Full Name <span aria-hidden="true" style="color:var(--danger)">*</span></label>
+        <input id="fullName" name="fullName" type="text" placeholder="As per CNIC" required />
+        <div id="fullNameErr" class="errorMsg">Please enter full name (min 3 chars).</div>
+      </div>
+
+      <div>
+        <label for="fatherName">Father / Husband Name</label>
+        <input id="fatherName" name="fatherName" type="text" placeholder="Father / husband name" />
+      </div>
+
+      <!-- Row 2 -->
+      <div>
+        <label for="cnic">CNIC (e.g. 12345-1234567-1) <span style="color:var(--danger)">*</span></label>
+        <input id="cnic" name="cnic" type="text" inputmode="numeric" placeholder="12345-1234567-1"
+               pattern="^\d{5}-\d{7}-\d{1}$" required maxlength="15" />
+        <div id="cnicErr" class="errorMsg">Enter CNIC in format 12345-1234567-1</div>
+        <div class="hint">Your CNIC will be used to verify eligibility.</div>
+      </div>
+
+      <div>
+        <label for="dob">Date of Birth</label>
+        <input id="dob" name="dob" type="date" />
+      </div>
+
+      <!-- Row 3 -->
+      <div>
+        <label for="phone">Mobile Number (WhatsApp preferred) <span style="color:var(--danger)">*</span></label>
+        <input id="phone" name="phone" type="tel" placeholder="+92 3XX-XXXXXXX" required />
+        <div id="phoneErr" class="errorMsg">Enter a phone number.</div>
+      </div>
+
+      <div>
+        <label for="email">Email (optional)</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" />
+      </div>
+
+      <!-- Row 4 -->
+      <div>
+        <label for="province">Province / Region</label>
+        <select id="province" name="province">
+          <option value="">Select province</option>
+          <option value="punjab">Punjab</option>
+          <option value="sindh">Sindh</option>
+          <option value="kpk">Khyber Pakhtunkhwa</option>
+          <option value="balochistan">Balochistan</option>
+          <option value="islamabad">Islamabad</option>
+          <option value="gilgit">Gilgit Baltistan</option>
+          <option value="azad">Azad Kashmir</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="city">City</label>
+        <input id="city" name="city" type="text" placeholder="Karachi, Lahore..." />
+      </div>
+
+      <!-- Row 5 -->
+      <div class="full">
+        <label for="address">Address</label>
+        <textarea id="address" name="address" placeholder="Street, area, nearest landmark..."></textarea>
+      </div>
+
+      <!-- Row 6 -->
+      <div>
+        <label for="program">Program / Assistance Required</label>
+        <select id="program" name="program" required>
+          <option value="">Select program</option>
+          <option value="food">Food / Ration</option>
+          <option value="medical">Medical</option>
+          <option value="education">Education</option>
+          <option value="cash">Cash Assistance</option>
+          <option value="other">Other</option>
+        </select>
+        <div id="programErr" class="errorMsg">Please choose a program.</div>
+      </div>
+
+      <div>
+        <label for="members">Household Members</label>
+        <input id="members" name="members" type="number" min="1" placeholder="Number of people in household" />
+        <div class="hint">Including applicant.</div>
+      </div>
+
+      <!-- Row 7: uploads -->
+      <div>
+        <label for="cnicFile">Upload CNIC (front/back)</label>
+        <input id="cnicFile" name="cnicFile" type="file" accept="image/*,application/pdf" />
+        <div class="hint">Max 2 files allowed. Images or PDF. (Client-side only)</div>
+        <div id="cnicPreview" class="preview"></div>
+      </div>
+
+      <div>
+        <label for="photo">Upload Photo (optional)</label>
+        <input id="photo" name="photo" type="file" accept="image/*" />
+        <div id="photoPreview" class="preview"></div>
+      </div>
+
+      <!-- Row 8 -->
+      <div class="full">
+        <label>
+          <input id="consent" name="consent" type="checkbox" />
+          &nbsp;I confirm that the information provided is correct and I consent to be contacted.
+        </label>
+        <div id="consentErr" class="errorMsg">You must give consent to proceed.</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="full row" style="justify-content:space-between; align-items:center;">
+        <div class="small">All fields marked * are required. This sample form saves data only in the browser for demo.</div>
+        <div class="actions">
+          <button type="button" class="ghost" id="clearBtn">Clear</button>
+          <button type="submit" class="primary">Submit Registration</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Success modal -->
+  <div id="successModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modalCard">
+      <h2 style="margin:0 0 8px 0; color:var(--accent-2)">Registration Submitted</h2>
+      <p class="small" id="successMsg">Thank you — your registration has been recorded (demo).</p>
+      <button class="ok" id="okBtn">OK</button>
+    </div>
+  </div>
+
+<script>
+  // Basic client-side validation & UI behaviors
+  (function(){
+    const form = document.getElementById('regForm');
+    const fullName = document.getElementById('fullName');
+    const cnic = document.getElementById('cnic');
+    const phone = document.getElementById('phone');
+    const program = document.getElementById('program');
+    const consent = document.getElementById('consent');
+    const cnicFile = document.getElementById('cnicFile');
+    const photo = document.getElementById('photo');
+    const cnicPreview = document.getElementById('cnicPreview');
+    const photoPreview = document.getElementById('photoPreview');
+    const successModal = document.getElementById('successModal');
+    const okBtn = document.getElementById('okBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    // helper
+    function showError(el, msgEl){
+      el.classList.add('error');
+      if(msgEl) msgEl.classList.add('show');
+    }
+    function clearError(el, msgEl){
+      el.classList.remove('error');
+      if(msgEl) msgEl.classList.remove('show');
+    }
+
+    // CNIC input auto-format (adds hyphens)
+    cnic.addEventListener('input', (e)=>{
+      let v = cnic.value.replace(/\D/g,'');
+      if(v.length > 13) v = v.slice(0,13);
+      // format 5-7-1
+      let parts = [];
+      if(v.length <=5) parts = [v];
+      else if(v.length <=12) parts = [v.slice(0,5), v.slice(5)];
+      else parts = [v.slice(0,5), v.slice(5,12), v.slice(12)];
+      cnic.value = parts.filter(Boolean).join('-');
+    });
+
+    // file previews (only images shown)
+    function previewFiles(inputEl, previewEl){
+      previewEl.innerHTML = '';
+      const files = Array.from(inputEl.files || []);
+      files.slice(0,2).forEach(file=>{
+        if(file.type.startsWith('image/')){
+          const img = document.createElement('img');
+          img.alt = file.name;
+          const reader = new FileReader();
+          reader.onload = (e) => { img.src = e.target.result; };
+          reader.readAsDataURL(file);
+          previewEl.appendChild(img);
+        } else {
+          const box = document.createElement('div');
+          box.textContent = file.name;
+          box.style.padding = '8px 10px';
+          box.style.border = '1px solid #eef6ff';
+          box.style.borderRadius = '8px';
+          box.style.fontSize = '13px';
+          previewEl.appendChild(box);
+        }
+      });
+    }
+
+    cnicFile.addEventListener('change', ()=> previewFiles(cnicFile, cnicPreview));
+    photo.addEventListener('change', ()=> previewFiles(photo, photoPreview));
+
+    // Clear button
+    clearBtn.addEventListener('click', ()=>{
+      form.reset();
+      cnicPreview.innerHTML = '';
+      photoPreview.innerHTML = '';
+      // clear errors
+      document.querySelectorAll('.error').forEach(el=> el.classList.remove('error'));
+      document.querySelectorAll('.errorMsg').forEach(el=> el.classList.remove('show'));
+    });
+
+    // submission
+    form.addEventListener('submit', (ev)=>{
+      ev.preventDefault();
+      // clear previous errors
+      document.querySelectorAll('.error').forEach(el=> el.classList.remove('error'));
+      document.querySelectorAll('.errorMsg').forEach(el=> el.classList.remove('show'));
+
+      let ok = true;
+      // full name check
+      if(!fullName.value || fullName.value.trim().length < 3){
+        showError(fullName, document.getElementById('fullNameErr'));
+        ok = false;
+      }
+      // CNIC check pattern: 12345-1234567-1
+      const cnicPattern = /^\d{5}-\d{7}-\d{1}$/;
+      if(!cnicPattern.test(cnic.value.trim())){
+        showError(cnic, document.getElementById('cnicErr'));
+        ok = false;
+      }
+      // phone basic check
+      if(!phone.value || phone.value.trim().length < 8){
+        showError(phone, document.getElementById('phoneErr'));
+        ok = false;
+      }
+      // program required
+      if(!program.value){
+        showError(program, document.getElementById('programErr'));
+        ok = false;
+      }
+      // consent
+      if(!consent.checked){
+        showError(consent, document.getElementById('consentErr'));
+        ok = false;
+      }
+
+      // files size limit (example: 6MB total)
+      const allFiles = [...(cnicFile.files || []), ...(photo.files || [])];
+      const totalBytes = allFiles.reduce((s,f)=> s + f.size, 0);
+      const maxBytes = 6 * 1024 * 1024; // 6 MB
+      if(totalBytes > maxBytes){
+        alert('Total uploaded file size must be less than 6 MB for this demo.');
+        ok = false;
+      }
+
+      if(!ok) return;
+
+      // For demo: save submission to localStorage (simulate server)
+      const data = new FormData(form);
+      const obj = {};
+      data.forEach((v,k) => {
+        if(v instanceof File){
+          // store file names only for demo
+          obj[k] = v.name || '';
+        } else {
+          obj[k] = v;
+        }
+      });
+      obj.submittedAt = new Date().toISOString();
+      // store in localStorage array
+      const key = 'saylani_demo_regs';
+      const arr = JSON.parse(localStorage.getItem(key) || '[]');
+      arr.unshift(obj);
+      localStorage.setItem(key, JSON.stringify(arr));
+
+      // show success modal
+      document.getElementById('successMsg').innerText = `Thank you ${fullName.value.trim()} — your registration has been recorded (demo).`;
+      successModal.style.display = 'flex';
+      successModal.setAttribute('aria-hidden','false');
+    });
+
+    okBtn.addEventListener('click', ()=>{
+      successModal.style.display = 'none';
+      successModal.setAttribute('aria-hidden','true');
+      form.reset();
+      cnicPreview.innerHTML = '';
+      photoPreview.innerHTML = '';
+    });
+
+  })();
+</script>
+</body>
+</html> 
