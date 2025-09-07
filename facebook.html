@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FaceClone — Final (Facebook Style)</title>
+  <style>
+    /* ===========================
+       FaceClone — Facebook style
+       =========================== */
+    :root{
+      --fb-blue: #1877f2;
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --muted: #65676b;
+      --shadow: 0 6px 18px rgba(11,22,33,0.06);
+      --radius: 12px;
+      --max-width: 1180px;
+      --text: #111;
+    }
+
+    /* Dark theme variables (toggled by .dark on body) */
+    body.dark {
+      --bg: #18191a;
+      --card: #242526;
+      --muted: #b0b3b8;
+      --text: #e6e6e6;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+      padding-bottom:60px;
+    }
+
+    /* Top header */
+    header{
+      position:sticky; top:0; z-index:200;
+      background:var(--bg);
+      box-shadow:0 1px 0 rgba(0,0,0,0.05);
+    }
+    .topbar{
+      max-width:var(--max-width); margin:0 auto;
+      display:flex; gap:12px; align-items:center;
+      padding:10px 14px;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px}
+    .brand .mark{width:44px;height:44px;border-radius:8px;background:var(--fb-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+    .search{flex:1}
+    .search input{
+      width:100%; padding:10px 14px; border-radius:22px; border:0; outline:none; background:var(--card); box-shadow:var(--shadow);
+      color:var(--text);
+    }
+    .top-controls{display:flex; gap:8px; align-items:center}
+    .icon-btn{
+      background:var(--card); padding:8px 12px; border-radius:10px; box-shadow:var(--shadow); cursor:pointer; display:flex; align-items:center; gap:8px;
+    }
+    .icon-btn:hover{transform:translateY(-2px); transition:all .12s ease}
+
+    /* Layout columns */
+    .container{
+      max-width:var(--max-width);
+      margin:18px auto;
+      display:grid;
+      grid-template-columns:260px 1fr 320px;
+      gap:18px;
+      align-items:start;
+      padding:0 12px;
+    }
+    .card{background:var(--card); padding:12px; border-radius:var(--radius); box-shadow:var(--shadow)}
+
+    /* Left sidebar */
+    .me{display:flex; gap:12px; align-items:center}
+    .avatar{width:48px; height:48px; border-radius:50%; background:#e2e6ea; display:flex; align-items:center; justify-content:center; font-weight:700}
+    .sidebar-list{margin-top:14px; display:flex; flex-direction:column; gap:8px}
+    .sidebar-item{display:flex; gap:10px; align-items:center; padding:10px; border-radius:10px; cursor:pointer}
+    .sidebar-item:hover{background:#f6f7f9}
+
+    /* Stories */
+    .stories{display:flex; gap:10px; padding:6px 2px; overflow:auto; margin-top:10px}
+    .story{min-width:110px; height:160px; border-radius:12px; overflow:hidden; position:relative; flex-shrink:0; background:#ddd}
+    .story img{width:100%; height:100%; object-fit:cover}
+    .story .name{position:absolute; left:8px; bottom:8px; color:white; font-weight:700; text-shadow:0 2px 8px rgba(0,0,0,0.45)}
+
+    /* Feed composer */
+    .feed{display:flex; flex-direction:column; gap:14px}
+    .composer{display:flex; flex-direction:column; gap:10px}
+    .composer-top{display:flex; gap:12px; align-items:center}
+    .composer input[type='text']{flex:1; padding:12px; border-radius:999px; border:0; background:var(--card); box-shadow:var(--shadow); color:var(--text)}
+    .composer-actions{display:flex; gap:8px}
+    .composer-actions button{cursor:pointer; padding:8px 12px; border-radius:8px; border:0; background:#f3f4f6}
+    .composer-actions button:hover{transform:translateY(-2px); transition:all .12s ease}
+
+    /* Post card */
+    .post-card{overflow:visible; padding:12px}
+    .post-head{display:flex; gap:12px; align-items:center}
+    .post-meta{font-size:13px; color:var(--muted)}
+    .post-body{margin-top:10px; font-size:15px; white-space:pre-wrap}
+    .post-image{margin-top:12px; border-radius:8px; overflow:hidden}
+    .post-image img{width:100%; height:auto; display:block; transition:transform .6s cubic-bezier(.2,.9,.2,1)}
+    .post-image:hover img{transform:scale(1.03)}
+
+    .post-actions{display:flex; gap:8px; margin-top:12px; border-top:1px solid rgba(0,0,0,0.06); padding-top:10px}
+    .action-btn{flex:1; padding:10px; border-radius:8px; cursor:pointer; text-align:center; border:0; background:transparent; font-weight:600}
+    .action-btn:hover{background:#f6f7f9}
+    .likes-count{font-weight:700; margin-left:6px}
+    .reaction-picker{position:absolute; display:flex; gap:8px; padding:8px; border-radius:8px; background:var(--card); box-shadow:var(--shadow); transform:translateY(-10px); z-index:50}
+    .reaction-item{padding:6px 8px; border-radius:8px; cursor:pointer; font-size:18px}
+
+    /* reaction styles */
+    .liked { color: var(--fb-blue); transform:scale(1.05); }
+    .reaction-selected { transform:translateY(-6px); transition:transform .12s; }
+
+    /* Comments */
+    .comments{margin-top:8px; display:flex; flex-direction:column; gap:8px}
+    .comment{display:flex; gap:8px; align-items:flex-start}
+    .bubble{background:#f0f2f5; padding:8px 10px; border-radius:12px; max-width:86%}
+    .comment-input-row{display:flex; gap:8px; margin-top:8px; align-items:center}
+    .comment-input{flex:1; padding:8px; border-radius:999px; border:0; background:#f0f2f5}
+
+    /* Edit/delete controls */
+    .post-controls{display:flex; gap:6px; margin-left:auto; align-items:center}
+    .small-muted{font-size:13px;color:var(--muted)}
+    .post-time{font-size:12px;color:var(--muted); margin-left:6px}
+
+    /* Right column */
+    .contacts{display:flex; flex-direction:column; gap:8px; margin-top:8px}
+    .contact{display:flex; gap:8px; align-items:center; padding:8px; border-radius:8px; cursor:pointer}
+    .contact:hover{background:#f2f3f5}
+
+    /* Stories modal */
+    .modal{
+      position:fixed; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,0.6); z-index:500; opacity:0; pointer-events:none; transition:opacity .18s ease;
+    }
+    .modal.show{opacity:1; pointer-events:auto}
+    .modal .modal-card{background:var(--card); width:90%; max-width:900px; border-radius:12px; padding:12px; box-shadow:var(--shadow)}
+    .modal img{width:100%; height:auto; border-radius:8px}
+
+    /* Scroll-to-top */
+    .scroll-top{
+      position:fixed; right:18px; bottom:18px; width:48px; height:48px; border-radius:50%; background:var(--fb-blue); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow); z-index:400; opacity:0; transform:translateY(8px); transition:all .18s ease;
+    }
+    .scroll-top.show{opacity:1; transform:translateY(0)}
+
+    /* Share toast */
+    .share-toast{
+      position:fixed; right:20px; bottom:20px; background:#111; color:#fff; padding:10px 14px; border-radius:10px; opacity:0; transform:translateY(14px); pointer-events:none;
+      transition:all .28s cubic-bezier(.2,.9,.2,1); z-index:600;
+    }
+    .share-toast.show{opacity:1; transform:translateY(0); pointer-events:auto}
+
+    /* small animations */
+    .post-card { opacity:0; transform:translateY(8px); animation: fadeIn .36s ease forwards; }
+    .post-card:nth-child(1){ animation-delay: .05s }
+    .post-card:nth-child(2){ animation-delay: .08s }
+    .post-card:nth-child(3){ animation-delay: .11s }
+    .post-card:nth-child(4){ animation-delay: .14s }
+    .post-card:nth-child(5){ animation-delay: .17s }
+    .post-card:nth-child(6){ animation-delay: .20s }
+    .post-card:nth-child(7){ animation-delay: .23s }
+    .post-card:nth-child(8){ animation-delay: .26s }
+    .post-card:nth-child(9){ animation-delay: .29s }
+    @keyframes fadeIn { to { opacity:1; transform:none } }
+
+    /* Responsive */
+    @media (max-width:1100px){
+      .container{grid-template-columns:1fr; padding:0 12px}
+      .left, .right{display:none}
+      .post-image img{max-height:500px; object-fit:cover}
+    }
+
+    /* tiny helpers */
+    .muted { color: var(--muted); font-size:13px }
+    .flex { display:flex; align-items:center; gap:8px }
+    .btn { padding:8px 10px; border-radius:8px; border:0; cursor:pointer }
+
+    .logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 22px;
+  font-weight: bold;
+  color: #1877F2;
+}
+
+.logo svg {
+  display: inline-block;
+}
+
+.logo-text {
+  color: #1877F2;
+}
+
+
+  </style>
+</head>
+<body>
+
+    <!-- Facebook Logo -->
+<div class="logo">
+  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="#1877F2">
+    <path d="M34 18C34 8.05888 25.9411 0 16 0C6.05887 0 -2 8.05888 -2 18C-2 26.7823 4.85062 34.005 13.4375 35.7578V23.2031H9.39062V18H13.4375V14.0625C13.4375 10.0781 15.9375 7.8125 19.5469 7.8125C21.2656 7.8125 23.0625 8.125 23.0625 8.125V12.0625H21.0469C19.0625 12.0625 18.5625 13.2656 18.5625 14.5156V18H22.875L22.1875 23.2031H18.5625V35.7578C27.1494 34.005 34 26.7823 34 18Z"/>
+  </svg>
+  <span class="logo-text">Facebook</span>
+</div>
+
+  <!-- Topbar -->
+  <header>
+    <div class="topbar">
+      <!-- <div class="brand"><div class="mark">f</div>FaceClone</div> -->
+      <div class="search"><input id="search" placeholder="Search posts or authors..." /></div>
+      <div class="top-controls">
+        <div class="icon-btn" id="sortBtn">Sort ▼</div>
+        <div class="icon-btn" id="darkToggle">🌙</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main layout -->
+  <main class="container">
+    <!-- LEFT -->
+    <aside class="left">
+      <div class="card">
+        <div class="me">
+          <div class="avatar" id="profileAvatar">AR</div>
+          <div>
+            <div style="font-weight:700" id="profileName">Abdur Rafay</div>
+            <div class="muted">View your profile</div>
+          </div>
+        </div>
+
+        <div class="sidebar-list">
+          <div class="sidebar-item">📰 News Feed</div>
+          <div class="sidebar-item">💬 Messenger</div>
+          <div class="sidebar-item">📄 Pages</div>
+          <div class="sidebar-item">📅 Events</div>
+          <div class="sidebar-item">⚙️ Settings</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="card">
+        <div style="font-weight:700;margin-bottom:8px">Stories</div>
+        <div class="stories" id="stories"></div>
+      </div>
+    </aside>
+
+    <!-- CENTER (FEED) -->
+    <section class="feed">
+      <div class="composer card">
+        <div class="composer-top">
+          <div class="avatar">AR</div>
+          <input type="text" id="postInput" placeholder="What's on your mind?" />
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="composer-actions">
+            <button id="photoBtn">📷 Photo (Auto)</button>
+            <button id="feelingBtn">😊 Feeling</button>
+          </div>
+          <div>
+            <button id="publishBtn" style="background:var(--fb-blue);color:#fff;padding:8px 12px;border-radius:8px;border:0;cursor:pointer">Post</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div class="muted">Filter</div>
+        <select id="filterSelect" style="padding:6px;border-radius:6px;border:0;background:var(--card);box-shadow:var(--shadow)">
+          <option value="all">All posts</option>
+          <option value="yours">My posts</option>
+        </select>
+        <div style="margin-left:auto" class="muted">Sort:</div>
+        <select id="sortSelect" style="padding:6px;border-radius:6px;border:0;background:var(--card);box-shadow:var(--shadow)">
+          <option value="newest">Newest</option>
+          <option value="most_liked">Most liked</option>
+          <option value="most_commented">Most commented</option>
+        </select>
+      </div>
+
+      <div id="postsContainer" aria-live="polite" style="display:flex; flex-direction:column; gap:14px; margin-top:8px"></div>
+    </section>
+
+    <!-- RIGHT -->
+    <aside class="right">
+      <div class="card">
+        <div style="font-weight:700">Contacts</div>
+        <div class="muted" style="margin-top:6px">Friends who are online</div>
+        <div class="contacts" id="contacts" style="margin-top:8px"></div>
+      </div>
+
+      <div style="margin-top:12px" class="card">
+        <div style="font-weight:700">Trending</div>
+        <div class="muted" style="margin-top:6px">Popular right now</div>
+        <ul style="margin-top:8px;padding-left:18px;color:var(--muted)">
+          <li>#WebDev</li>
+          <li>#Unsplash</li>
+          <li>#Design</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Stories modal -->
+  <div id="storyModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:700" id="modalTitle">Story</div>
+        <div style="cursor:pointer" id="closeStory">✕</div>
+      </div>
+      <img id="modalImage" src="" alt="story" />
+    </div>
+  </div>
+
+  <!-- scroll top & share toast -->
+  <div id="scrollTop" class="scroll-top" title="Back to top">↑</div>
+  <div id="shareToast" class="share-toast">Link copied to clipboard</div>
+
+  <script>
+    /*
+      FaceClone Final JavaScript
+      - Preloads 9 posts with picsum images
+      - Supports search, sort, filter, dark mode
+      - Reactions, like, comment, edit, delete, share
+      - Stories modal + scroll-to-top
+    */
+
+    // ---------- Config & Helpers ----------
+    const STORAGE_KEY = 'faceclone_final_v1';
+    const CURRENT_USER = { name: 'You', avatar: 'Y' }; // posts created by this username can be edited/deleted
+    const AUTHORS = ['Sara','Hamid','Zara','Ali','Usman','Laila','Aisha','Bilal','Nadia'];
+    const AVATARS = ['S','H','Z','A','U','L','A','B','N'];
+    const HARD_TEXTS = [
+      'Exploring the city — what a beautiful day!',
+      'Code, coffee, repeat. Building a social clone for my assignment.',
+      'Nature walk with friends. Fresh air and smiles.',
+      'Throwback to last summer — unforgettable trip!',
+      'Quick sketch of UI ideas — loving the blue header.',
+      'Cooking experiments: the perfect omelette recipe.',
+      'Late night debugging session — victory achieved.',
+      'New playlist dropped — share your favorite song!',
+      'Study group tomorrow at 5 PM. Who\'s in?'
+    ];
+
+    function genId(){ return 'p_' + Math.random().toString(36).slice(2,9); }
+    function now(){ return Date.now(); }
+
+    // stable picsum url (use id to reduce duplicate collisions)
+    function picsum(id, w=900, h=600){
+      const idx = (200 + id*13) % 1000 + 1;
+      return `https://picsum.photos/id/${idx}/${w}/${h}`;
+    }
+
+    // unsplash random (used for new posts); onerror falls back to picsum
+    const TOPICS = ['city','nature','people','travel','food','technology','music','sport','architecture'];
+    function unsplash(index, w=900, h=600){
+      const topic = TOPICS[index % TOPICS.length];
+      const sig = Math.floor(Date.now() / 1000) + index;
+      return `https://source.unsplash.com/random/${w}x${h}/?${topic}&sig=${sig}`;
+    }
+
+    // load or seed
+    function seedPosts(){
+      const arr = [];
+      for(let i=0;i<9;i++){
+        arr.push({
+          id: genId(),
+          name: AUTHORS[i],
+          avatar: AVATARS[i],
+          time: now() - (1000*60*60*(i+1)),
+          text: HARD_TEXTS[i],
+          likes: Math.floor(Math.random()*50),
+          reaction: null, // 'like','love','wow','sad','angry' etc stored as short key
+          comments: [],
+          image: picsum(i),
+          createdByYou: false
+        });
+      }
+      return arr;
+    }
+
+    function loadPosts(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) return JSON.parse(raw);
+      } catch(e){ console.error('load error', e); }
+      const seeded = seedPosts();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+      return seeded;
+    }
+
+    let posts = loadPosts();
+
+    function savePosts(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(posts)); }catch(e){console.error(e);} }
+
+    // ---------- DOM refs ----------
+    const postsContainer = document.getElementById('postsContainer');
+    const storiesEl = document.getElementById('stories');
+    const contactsEl = document.getElementById('contacts');
+    const postInput = document.getElementById('postInput');
+    const publishBtn = document.getElementById('publishBtn');
+    const searchInput = document.getElementById('search');
+    const sortSelect = document.getElementById('sortSelect');
+    const filterSelect = document.getElementById('filterSelect');
+    const darkToggle = document.getElementById('darkToggle');
+    const scrollTopBtn = document.getElementById('scrollTop');
+    const storyModal = document.getElementById('storyModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('modalTitle');
+    const closeStoryBtn = document.getElementById('closeStory');
+    const shareToast = document.getElementById('shareToast');
+
+    // ---------- Utility ----------
+    function timeAgo(ts){
+      const s = Math.floor((Date.now()-ts)/1000);
+      if(s<60) return s+'s';
+      const m = Math.floor(s/60); if(m<60) return m+'m';
+      const h = Math.floor(m/60); if(h<24) return h+'h';
+      const d = Math.floor(h/24); return d+'d';
+    }
+
+    function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    // ---------- Render helpers ----------
+    function createPostElement(post, idx){
+      const wrapper = document.createElement('div');
+      wrapper.className = 'post-card card';
+      wrapper.dataset.id = post.id;
+
+      // reaction label
+      const reactionLabel = post.reaction ? (' ' + reactionEmoji(post.reaction)) : '';
+
+      wrapper.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div class="post-head">
+            <div class="avatar">${esc(post.avatar || (post.name?post.name[0]:'U'))}</div>
+            <div>
+              <div style="font-weight:700">${esc(post.name)}</div>
+              <div class="post-meta">${timeAgo(post.time)} · <span class="small-muted">Public</span></div>
+            </div>
+          </div>
+          <div class="post-controls" style="display:flex; gap:8px; align-items:center;">
+            ${post.createdByYou ? `<button class="btn edit-post small-muted" title="Edit">✏️</button>
+            <button class="btn delete-post small-muted" title="Delete">🗑️</button>` : ''}
+          </div>
+        </div>
+
+        <div class="post-body" style="margin-top:10px">${esc(post.text)}</div>
+
+        ${post.image ? `<div class="post-image"><img src="${post.image}" alt="post image" loading="lazy" onerror="this.onerror=null;this.src='https://picsum.photos/900/600?random=${Math.floor(Math.random()*10000)}'"></div>` : ''}
+
+        <div class="post-actions">
+          <div style="position:relative; display:flex; flex:1;">
+            <button class="action-btn btn-like">👍 <span class="likes-count">${post.likes}</span></button>
+            <div class="reaction-holder" style="position:relative"></div>
+          </div>
+          <button class="action-btn btn-comment-toggle">💬 ${post.comments.length}</button>
+          <button class="action-btn btn-share">↗️ Share</button>
+        </div>
+
+        <div class="comments">
+          ${post.comments.map(c => `<div class="comment"><div class="avatar">${esc(c.name[0]||'U')}</div><div class="bubble"><b>${esc(c.name)}</b><div>${esc(c.text)}</div></div></div>`).join('')}
+        </div>
+
+        <div class="comment-input-row">
+          <input class="comment-input" placeholder="Write a comment..." />
+          <button class="comment-send btn">Send</button>
+        </div>
+      `;
+
+      // events
+      const likeBtn = wrapper.querySelector('.btn-like');
+      const commentToggle = wrapper.querySelector('.btn-comment-toggle');
+      const commentSend = wrapper.querySelector('.comment-send');
+      const commentInput = wrapper.querySelector('.comment-input');
+      const shareBtn = wrapper.querySelector('.btn-share');
+      const editBtn = wrapper.querySelector('.edit-post');
+      const deleteBtn = wrapper.querySelector('.delete-post');
+      const reactionHolder = wrapper.querySelector('.reaction-holder');
+
+      // attach reaction picker (hover or longpress)
+      attachReactionBehavior(likeBtn, reactionHolder, post);
+
+      likeBtn.addEventListener('click', (e) => {
+        // simple like toggle: if reaction already selected remove else set 'like'
+        const p = posts.find(x => x.id === post.id);
+        if(!p) return;
+        if(p.reaction === 'like'){
+          p.reaction = null; p.likes = Math.max(0, p.likes - 1);
+        } else {
+          // if had some other reaction, adjust likes accordingly
+          if(!p.reaction) p.likes++;
+          p.reaction = 'like';
+        }
+        savePosts(); renderPosts();
+      });
+
+      commentSend.addEventListener('click', ()=> {
+        const v = commentInput.value.trim();
+        if(!v) return;
+        addComment(post.id, CURRENT_USER.name, v);
+        commentInput.value='';
+      });
+
+      commentInput.addEventListener('keydown', (ev)=> {
+        if(ev.key === 'Enter') { ev.preventDefault(); commentSend.click(); }
+      });
+
+      commentToggle.addEventListener('click', ()=> {
+        commentInput.focus();
+      });
+
+      shareBtn.addEventListener('click', async ()=> {
+        const url = location.href.split('#')[0] + '#post-' + post.id;
+        try {
+          await navigator.clipboard.writeText(url);
+          showShareToast('Post link copied to clipboard');
+        } catch(e){
+          showShareToast('Copy failed — manually copy URL: ' + url);
+        }
+      });
+
+      if(editBtn){
+        editBtn.addEventListener('click', ()=> {
+          openEditModal(post.id);
+        });
+      }
+      if(deleteBtn){
+        deleteBtn.addEventListener('click', ()=> {
+          if(confirm('Delete this post?')) {
+            posts = posts.filter(p=>p.id !== post.id);
+            savePosts(); renderPosts();
+          }
+        });
+      }
+
+      return wrapper;
+    }
+
+    function renderPosts(){
+      // apply search and filters and sort
+      const q = (searchInput.value || '').trim().toLowerCase();
+      const filter = filterSelect.value;
+      const sort = sortSelect.value;
+
+      let arr = posts.slice();
+
+      // filter
+      if(filter === 'yours'){
+        arr = arr.filter(p => p.name === CURRENT_USER.name);
+      }
+
+      // search
+      if(q){
+        arr = arr.filter(p => (p.name && p.name.toLowerCase().includes(q)) || (p.text && p.text.toLowerCase().includes(q)));
+      }
+
+      // sort
+      if(sort === 'newest') { arr.sort((a,b)=>b.time - a.time); }
+      else if(sort === 'most_liked') { arr.sort((a,b)=> (b.likes || 0) - (a.likes || 0)); }
+      else if(sort === 'most_commented') { arr.sort((a,b)=> (b.comments.length||0) - (a.comments.length||0)); }
+
+      postsContainer.innerHTML = '';
+      arr.forEach((p,i)=> postsContainer.appendChild(createPostElement(p,i)));
+      attachPostEntrance(); // ensure animations apply
+    }
+
+    // slight entrance animation re-apply
+    function attachPostEntrance(){
+      Array.from(postsContainer.children).forEach((el, i) => {
+        el.style.animationDelay = (0.05 + i*0.03) + 's';
+      });
+    }
+
+    // ---------- Reactions ----------
+    function reactionEmoji(key){
+      return ({like:'👍', love:'❤️', haha:'😆', wow:'😮', sad:'😢', angry:'😡'})[key] || '';
+    }
+
+    const REACTIONS = [
+      { key:'like', label:'Like', emoji:'👍' },
+      { key:'love', label:'Love', emoji:'❤️' },
+      { key:'haha', label:'Haha', emoji:'😆' },
+      { key:'wow', label:'Wow', emoji:'😮' },
+      { key:'sad', label:'Sad', emoji:'😢' },
+      { key:'angry', label:'Angry', emoji:'😡' }
+    ];
+
+    function attachReactionBehavior(button, holder, post){
+      // create picker but keep hidden; attach hover and long-press behaviors
+      const picker = document.createElement('div');
+      picker.className = 'reaction-picker';
+      picker.style.display = 'none';
+      REACTIONS.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'reaction-item';
+        item.title = r.label;
+        item.textContent = r.emoji;
+        item.addEventListener('click', ()=> {
+          applyReaction(post.id, r.key);
+          picker.style.display='none';
+        });
+        picker.appendChild(item);
+      });
+      holder.appendChild(picker);
+
+      // show on hover (desktop)
+      button.addEventListener('mouseenter', (e) => {
+        const rect = button.getBoundingClientRect();
+        picker.style.left = '0px';
+        picker.style.display = 'flex';
+      });
+      // hide when leaving wrapper area
+      button.addEventListener('mouseleave', (e) => {
+        // set small delay to allow clicking reaction items
+        setTimeout(()=>{ if(!picker.matches(':hover')) picker.style.display='none'; }, 220);
+      });
+      picker.addEventListener('mouseleave', ()=> { picker.style.display='none'; });
+
+      // long-press support for touch devices
+      let pressTimer = null;
+      button.addEventListener('touchstart', (e) => {
+        pressTimer = setTimeout(()=>{ picker.style.display='flex'; }, 500);
+      }, {passive:true});
+      button.addEventListener('touchend', ()=> { if(pressTimer) clearTimeout(pressTimer); });
+    }
+
+    function applyReaction(postId, key){
+      const p = posts.find(x => x.id === postId);
+      if(!p) return;
+      // adjust likes count: treat 'like' as countable, others are reactions but we'll increment likes for first reaction only
+      if(!p.reaction){ p.likes = (p.likes || 0) + 1; }
+      p.reaction = key;
+      savePosts(); renderPosts();
+    }
+
+    // ---------- Comments ----------
+    function addComment(postId, name, text){
+      const p = posts.find(x => x.id === postId);
+      if(!p) return;
+      p.comments.push({ id: genId(), name, text });
+      savePosts(); renderPosts();
+    }
+
+    // ---------- Edit Post ----------
+    function openEditModal(postId){
+      const p = posts.find(x=>x.id===postId);
+      if(!p) return;
+      const newText = prompt('Edit post text:', p.text);
+      if(newText === null) return;
+      p.text = newText.trim();
+      p.time = now(); // update timestamp to show recent
+      savePosts(); renderPosts();
+    }
+
+    // ---------- Stories & Contacts ----------
+    function renderStories(){
+      storiesEl.innerHTML = '';
+      for(let i=0;i<9;i++){
+        const div = document.createElement('div');
+        div.className = 'story';
+        const img = document.createElement('img');
+        img.src = picsum(i, 300, 500);
+        img.loading = 'lazy';
+        img.onerror = function(){ this.onerror=null; this.src='https://picsum.photos/300/500?random=' + Math.floor(Math.random()*10000); }
+        div.appendChild(img);
+        const name = document.createElement('div'); name.className='name'; name.textContent = AUTHORS[i];
+        div.appendChild(name);
+        div.addEventListener('click', ()=> {
+          modalTitle.textContent = AUTHORS[i] + "'s story";
+          modalImage.src = img.src.replace('/300/500/', '/900/600/');
+          storyModal.classList.add('show'); storyModal.setAttribute('aria-hidden','false');
+        });
+        storiesEl.appendChild(div);
+      }
+    }
+
+    function renderContacts(){
+      contactsEl.innerHTML='';
+      const names = ['Sara','Ali','Hamid','Zara','Usman','Laila','Aisha','Bilal','Nadia'];
+      names.forEach(n => {
+        const el = document.createElement('div'); el.className='contact';
+        el.innerHTML = `<div class="avatar">${n[0]}</div><div style="flex:1"><div style="font-weight:700">${n}</div><div class="small-muted">Online</div></div><div>💬</div>`;
+        contactsEl.appendChild(el);
+      });
+    }
+
+    // ---------- Publish new post ----------
+    publishBtn.addEventListener('click', ()=>{
+      const text = (postInput.value || '').trim();
+      if(!text) { alert('Write something to post'); return; }
+      // attach unsplash random image; onerror fallback to picsum
+      const index = posts.length % TOPICS.length;
+      const imageUrl = unsplash(index);
+      const newPost = {
+        id: genId(),
+        name: CURRENT_USER.name,
+        avatar: CURRENT_USER.avatar,
+        time: now(),
+        text,
+        likes: 0,
+        reaction: null,
+        comments: [],
+        image: imageUrl,
+        createdByYou: true
+      };
+      posts.push(newPost);
+      savePosts(); renderPosts();
+      postInput.value = '';
+      // scroll to new post smoothly
+      setTimeout(()=> {
+        const el = document.querySelector(`[data-id="${newPost.id}"]`);
+        if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+      }, 120);
+    });
+
+    // ---------- Search & sort handlers ----------
+    searchInput.addEventListener('input', ()=> renderPosts());
+    sortSelect.addEventListener('change', ()=> renderPosts());
+    filterSelect.addEventListener('change', ()=> renderPosts());
+
+    // ---------- Dark mode ----------
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(prefersDark) document.body.classList.add('dark');
+    darkToggle.addEventListener('click', ()=> {
+      document.body.classList.toggle('dark');
+    });
+
+    // ---------- Story modal ----------
+    closeStoryBtn.addEventListener('click', ()=> {
+      storyModal.classList.remove('show'); storyModal.setAttribute('aria-hidden','true');
+    });
+    storyModal.addEventListener('click', (e) => { if(e.target === storyModal) { storyModal.classList.remove('show'); storyModal.setAttribute('aria-hidden','true'); } });
+
+    // ---------- Scroll to top ----------
+    window.addEventListener('scroll', ()=> {
+      if(window.scrollY > 400) scrollTopBtn.classList.add('show'); else scrollTopBtn.classList.remove('show');
+    });
+    scrollTopBtn.addEventListener('click', ()=> window.scrollTo({ top:0, behavior:'smooth' }));
+
+    // ---------- Share toast  ----------
+    let shareTimer = null;
+    function showShareToast(msg){
+      shareToast.textContent = msg; shareToast.classList.add('show');
+      if(shareTimer) clearTimeout(shareTimer);
+      shareTimer = setTimeout(()=> shareToast.classList.remove('show'), 2300);
+    }
+
+    // ---------- Utility: Sort menu (simple) ----------
+    const sortBtn = document.getElementById('sortBtn');
+    sortBtn.addEventListener('click', ()=> {
+      const current = sortSelect.value;
+      if(current === 'newest') sortSelect.value = 'most_liked';
+      else if(current === 'most_liked') sortSelect.value = 'most_commented';
+      else sortSelect.value = 'newest';
+      renderPosts();
+    });
+
+    // ---------- Initial render ----------
+    renderStories();
+    renderContacts();
+    renderPosts();
+
+    // expose small helpers for debugging in console
+    window.FaceClone = {
+      posts,
+      regenPicsum: ()=> { posts.forEach((p,i)=> p.image = picsum(i)); savePosts(); renderPosts(); },
+      clearAll: ()=> { localStorage.removeItem(STORAGE_KEY); posts = loadPosts(); renderPosts(); },
+      reseed: ()=> { posts = seedPosts(); savePosts(); renderPosts(); }
+    };
+
+    // ---------- Reaction & like handling note ----------
+    // We treat 'like' as the primary like that increments count. Other reactions currently set 'reaction' field but we keep likes count increment when picking any reaction if previously no reaction existed.
+    // This is a simplified behavior suitable for a front-end assignment.
+
+  </script>
+</body>
+</html>
